@@ -4,12 +4,18 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
+
+import java.io.File;
 
 /**
  * A thin facade around an Android Message that defines the schema of
  * a reply from the Service back to the Activity.
  */
 public class ReplyMessage extends RequestReplyMessageBase {
+
+    private static final String TAG = ReplyMessage.class.getSimpleName();
+
     /**
      * Constructor is private to ensure the makeReplyMessage() factory
      * method is used.
@@ -41,20 +47,32 @@ public class ReplyMessage extends RequestReplyMessageBase {
         // Create a new Bundle and set it as the "data" for the
         // ReplyMessage.
         // TODO -- you fill in here.
+        Bundle data = new Bundle();
+        replyMessage.setData(data);
 
         // Set the URL to the image file into the Bundle.
         // TODO -- you fill in here.
+        replyMessage.setImageURL(url);
 
         // Set the request code into the Bundle.
         // TODO -- you fill in here.
+        replyMessage.setRequestCode(requestCode);
 
         // Set the resultCode in the Message to indicate whether the
         // download succeeded or failed.
         // TODO -- you fill in here.
+        File imageFile =  new File(pathToImageFile.getPath());
 
+        if(imageFile.exists())
+            replyMessage.setResultCode(Activity.RESULT_OK);
+        else {
+            Log.e(TAG, "Image download was not successfull");
+            replyMessage.setResultCode(Activity.RESULT_CANCELED);
+        }
         // Put the path to the image file into the Bundle via the
         // IMAGE_PATHNAME key only if the download succeeded.
         // TODO -- you fill in here.
+        replyMessage.setImagePathname(pathToImageFile);
 
         return replyMessage;
     }
