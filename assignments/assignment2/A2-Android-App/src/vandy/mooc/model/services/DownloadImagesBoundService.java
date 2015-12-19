@@ -5,7 +5,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import vandy.mooc.common.LifecycleLoggingService;
+import vandy.mooc.model.datamodel.ReplyMessage;
 import vandy.mooc.model.datamodel.RequestMessage;
+import vandy.mooc.utils.NetUtils;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -77,24 +80,30 @@ public class DownloadImagesBoundService extends LifecycleLoggingService {
 	 * the local device and image file's URI is sent back to the
 	 * MainActivity via the Messenger passed with the message.
 	 */
-	public void handleMessage(Message message) {
+	public void handleMessage(final Message message) {
+
+		Log.i(TAG, "Req Recieved by service");
 	    // Convert the Message into a RequestMessage.
 	    final RequestMessage requestMessage =
 		RequestMessage.makeRequestMessage(message);
 
 	    // Get the reply Messenger.
 	    // TODO -- you fill in here.
+		final Messenger replyMessenger = requestMessage.getMessenger();
 
 	    // Get the URL associated with the Message.
 	    // TODO -- you fill in here.
+		final Uri imageUrl = requestMessage.getImageURL();
 
 	    // Get the directory pathname where the image will be
 	    // stored.
 	    // TODO -- you fill in here.
+		final Uri imageDir = requestMessage.getDirectoryPathname();
 
 	    // Get the requestCode for the operation that was invoked
 	    // by the Activity.
 	    // TODO -- you fill in here.
+		final int reqCode = requestMessage.getRequestCode();
 
 	    // A Runnable that downloads the image, stores it in a
 	    // file, and sends the path to the file back to the
@@ -106,20 +115,37 @@ public class DownloadImagesBoundService extends LifecycleLoggingService {
 		     */
 		    @Override
 			public void run() {
-	
-			// Download and store the requested image.
-			// TODO -- you fill in here.
 
-			// Send the path to the image file, url, and
-			// requestCode back to the Activity via the
-			// replyMessenger.
-			// TODO -- you fill in here.
-		    }
+				Log.i(TAG,"Starting Downloading Image");
+	
+				// Download and store the requested image.
+				// TODO -- you fill in here.
+
+				try {
+					 Uri imagePath = NetUtils.downloadImage(mService.get().getApplicationContext(), imageUrl, imageDir);
+					sendPath(replyMessenger, imagePath, imageUrl, reqCode);
+				}catch (Exception e){
+					Log.e(TAG,"Error occured in downloading and saving image");
+					e.printStackTrace();
+				}
+//				Log.i(TAG,"ImagePath:"+imagePath.getPath());
+
+				// Send the path to the image file, url, and
+				// requestCode back to the Activity via the
+				// replyMessenger.
+				// TODO -- you fill in here.
+
+
+
+			}
 		};
 
 	    // Execute the downloadImageAndReply Runnable to download
 	    // the image and reply.
-	    // TODO -- you fill in here.
+		// TODO -- you fill in here.
+		mExecutorService.execute(downloadImageAndReply);
+
+//		new Thread(downloadImageAndReply).run();
 	}
 
 	/**
@@ -130,17 +156,21 @@ public class DownloadImagesBoundService extends LifecycleLoggingService {
 			     Uri pathToImageFile,
 			     Uri url,
 			     int requestCode) {
+		Log.i(TAG,"entering sendPath message");
 	    // Call the makeReplyMessage() factory method to create
 	    // Message.
+
+		ReplyMessage replyMsg = ReplyMessage.makeReplyMessage(pathToImageFile, url, requestCode);
 	    // TODO -- you fill in here.
 	    try {
 		Log.d(TAG,
-		      "sending "
-		      + pathToImageFile
-		      + " back to the MainActivity");
+				"sending "
+						+ pathToImageFile
+						+ " back to the MainActivity");
 
 		// Send the replyMessage back to the Activity.
 		// TODO -- you fill in here.
+			messenger.send(replyMsg.getMessage());
 	    } catch (RemoteException e) {
 		Log.e(getClass().getName(),
 		      "Exception while sending reply message back to Activity.",
@@ -153,7 +183,8 @@ public class DownloadImagesBoundService extends LifecycleLoggingService {
 	 */
 	public void shutdown() {
 	    // Immediately shutdown the ExecutorService.
-	    // TODO -- you fill in here.        
+	    // TODO -- you fill in here.
+		mExecutorService.shutdown();
 	}
     }
 
@@ -165,7 +196,8 @@ public class DownloadImagesBoundService extends LifecycleLoggingService {
         // Create an intent that will download the image from the web.
     	// TODO -- you fill in here, replacing null with the proper
     	// code.
-        return null;
+
+        return new Intent(context,DownloadImagesBoundService.class);
     }
 
     /**
@@ -175,10 +207,13 @@ public class DownloadImagesBoundService extends LifecycleLoggingService {
 	public void onCreate() {
         // Create a RequestHandler used to handle request Messages
         // sent from an Activity.
+		Log.i(TAG, "Entered on Create of bound service");
     	// TODO -- you fill in here.
+		mRequestHandler = new RequestHandler(this);
 
         // Create a Messenger that encapsulates the RequestHandler.
     	// TODO -- you fill in here.
+		mRequestMessenger = new Messenger(mRequestHandler);
     }
 
     /**
@@ -202,5 +237,7 @@ public class DownloadImagesBoundService extends LifecycleLoggingService {
 
         // Shutdown the RequestHandler.
     	// TODO -- you fill in here.
+		mRequestHandler.shutdown();
+
     }
 }

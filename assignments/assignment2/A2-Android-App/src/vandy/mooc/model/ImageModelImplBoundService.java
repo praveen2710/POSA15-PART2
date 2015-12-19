@@ -53,6 +53,8 @@ public class ImageModelImplBoundService
                 // returned IBinder object and store it for later use
                 // in mRequestMessengerRef.
                 // TODO -- you fill in here.
+
+                mRequestMessengerRef = new Messenger(binder);
             }
 
             /**
@@ -67,6 +69,8 @@ public class ImageModelImplBoundService
                 // null, thereby preventing send() calls until it's
                 // reconnected.
                 // TODO -- you fill in here.
+
+                mRequestMessengerRef = null;
             }
 	};
 
@@ -92,12 +96,13 @@ public class ImageModelImplBoundService
             // that can download an image from the URL given by the
             // user.
             // TODO - you fill in here.
-
+            Intent boundServiceIntent = DownloadImagesBoundService.makeIntent(mImagePresenter.get().getApplicationContext());
             Log.d(TAG,
-                  "calling bindService()");
+                  "calling bindService() of activity");
 
             // Bind to the Service associated with the Intent.
             // TODO -- you fill in here.
+            mImagePresenter.get().getApplicationContext().bindService(boundServiceIntent,mServiceConnection,Context.BIND_AUTO_CREATE);
         }
     }
 
@@ -113,10 +118,11 @@ public class ImageModelImplBoundService
                   "calling unbindService()");
             // Unbind from the Service.
             // TODO -- you fill in here.
-
+            mImagePresenter.get().getApplicationContext().unbindService(mServiceConnection);
             // Set this field to null to trigger a call to
             // bindService() next time bindService() is called.
             // TODO -- you fill in here.
+            mRequestMessengerRef = null;
         } 
     }
 
@@ -157,6 +163,7 @@ public class ImageModelImplBoundService
 
                 // Send the request Message to the DownloadService.
                 // TODO -- you fill in here.
+                mRequestMessengerRef.send(requestMessage.getMessage());
             } catch (Exception e) {
                 e.printStackTrace();
             }
