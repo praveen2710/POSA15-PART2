@@ -121,20 +121,16 @@ public class DownloadImagesBoundService extends LifecycleLoggingService {
 				// Download and store the requested image.
 				// TODO -- you fill in here.
 
-				try {
-					 Uri imagePath = NetUtils.downloadImage(mService.get().getApplicationContext(), imageUrl, imageDir);
-					sendPath(replyMessenger, imagePath, imageUrl, reqCode);
-				}catch (Exception e){
-					Log.e(TAG,"Error occured in downloading and saving image");
-					e.printStackTrace();
-				}
-//				Log.i(TAG,"ImagePath:"+imagePath.getPath());
+
+				Uri imagePath = NetUtils.downloadImage(mService.get().getApplicationContext(), imageUrl, imageDir);
+
+
 
 				// Send the path to the image file, url, and
 				// requestCode back to the Activity via the
 				// replyMessenger.
 				// TODO -- you fill in here.
-
+				sendPath(replyMessenger, imagePath, imageUrl, reqCode);
 
 
 			}
@@ -144,8 +140,8 @@ public class DownloadImagesBoundService extends LifecycleLoggingService {
 	    // the image and reply.
 		// TODO -- you fill in here.
 		mExecutorService.execute(downloadImageAndReply);
-
-//		new Thread(downloadImageAndReply).run();
+//An alternative way if we dont have executor service
+//		new Thread(downloadImageAndReply).start();
 	}
 
 	/**
