@@ -93,7 +93,7 @@ public class ViewPagerActivity extends FragmentActivity {
      * 
      * @param directoryPathname
      *            Filepath storing images to display
-     * @param pos
+     * @param position
      *            Position of starting image
      * @return
      */
@@ -188,7 +188,7 @@ public class ViewPagerActivity extends FragmentActivity {
             Log.v(TAG,
                   "ImagePagerAdapter constructor()");
             mBitmapFiles =
-                new ArrayList<>(Arrays.asList(files));
+                new ArrayList<File>(Arrays.asList(files));
         }
 
         /**

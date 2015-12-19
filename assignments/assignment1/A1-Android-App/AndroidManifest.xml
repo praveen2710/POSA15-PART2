@@ -50,7 +50,7 @@
 
         <service
             android:name=".model.services.DownloadImagesStartedService"
-            android:process=":remote2" >
+           >
         </service>
     </application>
 

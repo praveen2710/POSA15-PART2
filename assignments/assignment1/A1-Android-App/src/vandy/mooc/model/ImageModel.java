@@ -58,7 +58,7 @@ public class ImageModel
     @Override
     public void onCreate(MVP.RequiredPresenterOps presenter) {
         // Set the WeakReference.
-        mImagePresenter = new WeakReference<>(presenter);
+        mImagePresenter = new WeakReference<MVP.RequiredPresenterOps>(presenter);
 
         // Create a STARTED_SERVICE.
         setServiceType(ServiceType.STARTED_SERVICE);
