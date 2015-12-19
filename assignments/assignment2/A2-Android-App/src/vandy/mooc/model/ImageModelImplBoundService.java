@@ -22,7 +22,7 @@ public class ImageModelImplBoundService
     /**
      * Reference to the reply Messenger that's passed to the
      * DownloadImagesBoundService and used to return image results via
-     * the ServiceResultHandler.
+     * the Handler.
      */
     private Messenger mReplyMessenger = null;
 
@@ -37,7 +37,8 @@ public class ImageModelImplBoundService
      * Used to receive a reference to the RequestMessenger after
      * binding to the DownloadImagesBoundService using bindService().
      */
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
+    private ServiceConnection mServiceConnection = 
+        new ServiceConnection() {
             /**
              * Called by the Android Binder framework after the
              * DownloadImagesBoundService is connected to convey the
@@ -161,7 +162,8 @@ public class ImageModelImplBoundService
                       "sending a request message to DownloadImagesBoundService for "
                       + url.toString());
 
-                // Send the request Message to the DownloadService.
+                // Send the request Message to the
+                // DownloadImagesBoundService.
                 // TODO -- you fill in here.
                 mRequestMessengerRef.send(requestMessage.getMessage());
             } catch (Exception e) {
